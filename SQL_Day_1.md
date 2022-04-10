@@ -1,3 +1,6 @@
+
+### 175. Combine Two Tables (Easy)
+
 ```sql
 SELECT
     P.firstName,
