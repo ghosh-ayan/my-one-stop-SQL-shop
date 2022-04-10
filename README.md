@@ -1,16 +1,9 @@
 # my-one-stop-SQL-shop
 
-### 175. Combine Two Tables
+My one stop shop for all different kinds of SQL Problem solving and concept building.
 
-```sql
-SELECT
-    P.firstName,
-    P.lastName,
-    A.city,
-    A.state
-FROM
-    Person P
-    LEFT JOIN 
-    Address A ON A.personId = P.personId
-;
-```
+1. Solving SQL Query Problems.
+2. Usage of different dialects - MySQL, T-SQL ,PostgreSQL
+3. Writing procedural SQL
+4. Content on Query Optimization
+5. SQL for Analytics
