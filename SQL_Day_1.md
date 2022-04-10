@@ -14,7 +14,7 @@ FROM
 ;
 ```
 
-### 177. Nth Highest Salary
+### 177. Nth Highest Salary (Medium)
 
 There are different ways of doing this.
 
@@ -95,10 +95,31 @@ END
 This is just the N-version of Approach 3.
 
 ```sql
-CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INT
+CREATE FUNCTION getNthHighestSalary(N INT) RETURNS INotT
 BEGIN
 RETURN (
   select distinct e1.salary from Employee e1 where N-1 = (select count(distinct e2.Salary) from Employee e2 where e1.Salary < e2.Salary)
 );
 END
 ```
+
+### 178. Rank Scores
+
+The question is a simple DENSE_RANK(question). But the trick is that they expect that the output column be named as *rank*. The trick to do that is to use quotes when creating the alias, otherwise MySQL throws an error as rank is a keyword.
+
+```sql
+SELECT
+    s.score,
+    DENSE_RANK() OVER(ORDER BY s.score DESC) AS 'rank'
+FROM
+    Scores s;
+```
+
+However, another option is do below, but not only is this verbose, but also 50% slower if the below 
+
+```sql
+select score, (select count(distinct score) from scores s2 where s2.score >= s1.score) as "Rank"
+from scores s1
+order by score desc;
+```
+
