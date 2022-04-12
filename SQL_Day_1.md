@@ -103,7 +103,7 @@ RETURN (
 END
 ```
 
-### 178. Rank Scores
+### 178. Rank Scores (Medium)
 
 The question is a simple DENSE_RANK(question). But the trick is that they expect that the output column be named as *rank*. The trick to do that is to use quotes when creating the alias, otherwise MySQL throws an error as rank is a keyword.
 
@@ -123,7 +123,7 @@ from scores s1
 order by score desc;
 ```
 
-### 181. Employees Earning More Than Their Managers
+### 181. Employees Earning More Than Their Managers (Easy)
 
 ```sql
 SELECT
