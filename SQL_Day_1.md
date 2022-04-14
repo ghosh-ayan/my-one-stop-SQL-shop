@@ -186,6 +186,26 @@ FROM
                             AND t1.Max_Salary = e2.salary;
 ```
 
+### 185. Department Top Three Salaries
 
+If you solved the previous one, this one is just addition of a window function dense_rank().
+Strategy for both questions : The second table just has one additional info - department name. So do everything you need from the first table, and then later join it with the second table to get the department name.
+
+```sql
+WITH t1 AS (SELECT
+    e1.*,
+    DENSE_RANK() OVER(PARTITION BY e1.departmentId ORDER BY salary DESC) as salary_rank
+FROM
+    Employee e1)
+
+SELECT
+    d.name as Department,
+    t1.name as Employee,
+    t1.salary as Salary
+FROM
+    t1
+    JOIN Department d ON t1.departmentId =  d.id
+WHERE t1.salary_rank <=3;
+```
 
 
