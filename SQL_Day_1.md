@@ -186,7 +186,7 @@ FROM
                             AND t1.Max_Salary = e2.salary;
 ```
 
-### 185. Department Top Three Salaries
+### 185. Department Top Three Salaries (Hard)
 
 If you solved the previous one, this one is just addition of a window function dense_rank().
 Strategy for both questions : The second table just has one additional info - department name. So do everything you need from the first table, and then later join it with the second table to get the department name.
@@ -207,5 +207,24 @@ FROM
     JOIN Department d ON t1.departmentId =  d.id
 WHERE t1.salary_rank <=3;
 ```
+### 196. Delete Duplicate Emails (Easy)
 
+Although labelled as easy, this one is pretty tricky.
 
+The reason is that you have to use a DELETE clause. While you are using a DELELTE clause, you cannot use a subquery on the same table in its DELETE WHERE clause.
+So the trick is that since CTE execution happens before all this, identify the ids tio be deleted usong proper JOIN Clause, make a list of those ids. Use that CTE in the WHERE clause of DELETE, which is allowed.
+
+    
+```sql
+WITH t1 AS ( SELECT p1.id
+                FROM
+                Person p1
+                JOIN Person p2 ON p1.email = p2.email
+                                  AND p1.id > p2.id
+                    )
+DELETE
+FROM
+    Person p
+WHERE
+    p.id IN ( SELECT t1.id FROM t1);
+```
