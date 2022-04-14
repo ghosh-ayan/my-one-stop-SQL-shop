@@ -135,3 +135,17 @@ WHERE
     AND e1.salary > (SELECT e2.salary FROM Employee e2 WHERE e2.id=e1.managerId)
 ;
 ```
+### 182. Duplicate Emails
+
+This is a case where not all the elements in a row are duplicate.
+Also this is a case where we just need to find the duplicates. Not remove them.
+So a simple Count() HAVING will work with GROUP BY.
+```sql
+SELECT
+    p1.email
+FROM
+    Person p1
+GROUP BY p1.email
+HAVING COUNT(*) > 1;
+
+```
