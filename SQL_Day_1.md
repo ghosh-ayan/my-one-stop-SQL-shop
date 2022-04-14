@@ -135,7 +135,7 @@ WHERE
     AND e1.salary > (SELECT e2.salary FROM Employee e2 WHERE e2.id=e1.managerId)
 ;
 ```
-### 182. Duplicate Emails
+### 182. Duplicate Emails (Easy)
 
 This is a case where not all the elements in a row are duplicate.
 Also this is a case where we just need to find the duplicates. Not remove them.
@@ -149,3 +149,15 @@ GROUP BY p1.email
 HAVING COUNT(*) > 1;
 
 ```
+
+### 183. Customers Who Never Order (Easy)
+```sql
+SELECT
+    c.name as Customers
+FROM
+    Customers c
+    LEFT JOIN Orders o ON o.customerId = c.id
+WHERE
+    o.id IS NULL;
+```
+
