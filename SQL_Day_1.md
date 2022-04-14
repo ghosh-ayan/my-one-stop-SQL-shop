@@ -161,3 +161,31 @@ WHERE
     o.id IS NULL;
 ```
 
+### 184. Department Highest Salary (Medium)
+
+Pretty tricky question, mainly because of the format of the resultset expected output which requires columns from both the tables.
+Note:
+1) The resultset output contains columns from both tables. So a JOIN is inevitable. So do a JOIN. Since you are joining, do a GROUP BY and put depertmentid and departmentname as part of the GROUP BY and get the Max salary. Now you have departmentId, department name and Max salary of that department.
+2) Use the above as a CTE. You have got all the rows except the employee name(s) having that max salary in the table. So do a JOIN with the CTE, and get the name from the employee where the salary is matching.
+
+```sql
+WITH t1 AS
+(SELECT
+    e1.departmentId, d.name, MAX(e1.salary) as Max_Salary
+FROM
+    Employee e1
+    JOIN Department d ON d.id = e1.departmentId
+GROUP BY e1.departmentId, d.name
+SELECT 
+    t1.name as Department, 
+    e2.name as Employee,
+    e2.salary as Salary
+FROM 
+    t1
+    JOIN Employee e2 ON t1.departmentId = e2.departmentId
+                            AND t1.Max_Salary = e2.salary;
+```
+
+
+
+
