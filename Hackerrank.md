@@ -1,3 +1,6 @@
+The tricky part in this problem is to make sure to use ORDER BY in the outer query instead of the inner query.
+Also check out how to ensure that the score condition is met.
+
 ```sql
 SELECT 
     cte1.hacker_id,
