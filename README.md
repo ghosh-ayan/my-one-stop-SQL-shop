@@ -1,6 +1,6 @@
 # my-one-stop-SQL-shop
 
-My one stop shop for all different kinds of SQL Problem solving and concept building.
+One stop shop for all different kinds of SQL Problem solving and concept building.
 
 1. Solving SQL Query Problems.
 2. Usage of different dialects - MySQL, T-SQL ,PostgreSQL
