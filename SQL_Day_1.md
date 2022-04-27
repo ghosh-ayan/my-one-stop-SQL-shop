@@ -228,3 +228,17 @@ FROM
 WHERE
     p.id IN ( SELECT t1.id FROM t1);
 ```
+
+### 197. Rising Temperature
+
+The trick is to join on a DATEDIFF. The join can itself handle all the filtering logic.
+```sql
+SELECT
+    weather.id AS 'Id'
+FROM
+    weather
+        JOIN
+    weather w ON DATEDIFF(weather.recordDate, w.recordDate) = 1
+        AND weather.Temperature > w.Temperature
+;
+```
