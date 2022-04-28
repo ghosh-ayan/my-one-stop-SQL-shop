@@ -352,3 +352,31 @@ FROM
 WHERE
     t1.loginorder = 1;
 ```
+### 534. Game Play Analysis III
+
+Ideas:
+    - Basically the question needs running totals for unique playerid and date. It means using SUM() as window function is one of the obvious choices
+    - SUM() when used as window function along with an ORDER BY takes the frame as UNBOUNDED PRECEDING to CURRENT ROW by default, producing running totals. However, it does not hurt to mention it explicitly.
+    - Usage of RANGE seems to be appropriate to specify frame as there could be multiple entries with the same date. ALthough the test case does not have such entries.
+    - Some of the solutions in the discussion may suggest that it could be done without a CTE, but they assume that it is not possible for the same player to play using multiple devices on the same day. Or the user having multiple logins on the same day on the same device. The solution below, on the other hand, is robust to such scenarions. 
+    - Used GROUP BY instead of SELECT DISTINCT in the actual query to make it more efficient.
+    
+```sql
+WITH t1 as (SELECT
+    a.player_id,
+    a.event_date,
+    a.games_played,
+    SUM(a.games_played) 
+        OVER (PARTITION BY a.player_id ORDER BY a.event_date
+             RANGE UNBOUNDED PRECEDING) AS games_played_so_far
+FROM
+    Activity a)
+SELECT 
+    t1.player_id,
+    t1.event_date,
+    t1.games_played_so_far
+FROM
+    t1
+GROUP BY t1.player_id, t1.event_date, t1.games_played_so_far
+ORDER BY t1.player_id, t1.event_date;
+```
