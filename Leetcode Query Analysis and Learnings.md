@@ -488,7 +488,7 @@ FROM
     HAVING COUNT(e2.id) >= 5) t1;
 ```
 
-### 571. Find Median Given Frequency of Numbers
+### 571. Find Median Given Frequency of Numbers (Hard)
 
 Idea:       
 - Do not actually try to decompress this in SQL. Hope that is clear.
@@ -516,4 +516,68 @@ WHERE
     t1.cumulative_frequency = (SELECT MIN(t1.cumulative_frequency) FROM t1 WHERE t1.cumulative_frequency >= FLOOR((total_frequency + 1)/2))
     OR
     t1.cumulative_frequency = (SELECT MIN(t1.cumulative_frequency) FROM t1 WHERE t1.cumulative_frequency >= FLOOR((total_frequency + 2)/2)) ;
+```
+
+### 574. Winning Candidate (Medium)
+
+Idea :     
+- The first solution is the one given in leetcode.
+- The second solution is what I created.
+- In case you can do all computation in 1 table, but you need a column from another, do all calculation in one table and just use it as key in the other table. This involves subquery. JOIN can also be used though.
+
+```sql
+WITH t1 as (SELECT
+    c.id,
+    c.name,
+    COUNT(v.id) AS total_votes
+FROM
+    Vote v
+    JOIN Candidate c ON c.id = v.candidateId
+GROUP BY c.id, c.name)
+SELECT
+    t1.name
+FROM
+    t1
+ORDER BY t1.total_votes DESC
+LIMIT 1;
+```
+
+
+```sql
+SELECT
+    name AS 'Name'
+FROM
+    Candidate
+        JOIN
+    (SELECT
+        Candidateid
+    FROM
+        Vote
+    GROUP BY Candidateid
+    ORDER BY COUNT(*) DESC
+    LIMIT 1) AS winner
+WHERE
+    Candidate.id = winner.Candidateid
+;
+```
+
+### 577. Employee Bonus
+
+A very deceptive question indeed!
+
+This is one of those questions that show you the need to consider LEFT JOINs and possibility of null values.
+
+The trick is to realize the business scenario of the situation and understand that some employees may have 0 bonus, and are not present in the bonus table. So employees with bonus lower than 1000 would include those employees as well who do not have a bonus at all.
+
+```sql
+SELECT
+    e.name,
+    b.bonus
+FROM
+    Employee e
+    LEFT JOIN 
+    Bonus b ON b.empId = e.empId
+WHERE
+    b.bonus < 1000 
+    OR b.bonus IS NULL;
 ```
