@@ -229,7 +229,7 @@ WHERE
     p.id IN ( SELECT t1.id FROM t1);
 ```
 
-### 197. Rising Temperature
+### 197. Rising Temperature (Easy)
 
 The trick is to join on a DATEDIFF. The join can itself handle all the filtering logic.
 ```sql
@@ -242,3 +242,49 @@ FROM
         AND weather.Temperature > w.Temperature
 ;
 ```
+
+### 262. Trips and Users (Hard)
+
+Ideas :
+    - The JOIN option looks a bit tricky and reads bad. Subquery option felt better.
+    - CTE based solution. But breaking into CTES does two things - produces clean code, also is better for performance
+    - Two step process- Removes all banned users in first CTE, uses first CTE to subquery and filter the Trips table
+    - Create an additional column using CASE WHEN. Whenever there is a rate based calculation, creating a binary column and taking its average and rounding off is a good idea.
+    - Final step utilizes the above CTES to simply group and order the data. Perhaps it is possible to do this using a single CTE, but since the CASE WHEN new column needs to be there for the calculation, maybe two CTEs are required.
+
+```sql
+WITH t1 as (
+    SELECT 
+        u.users_id,
+        u.banned,
+        u.role
+    FROM    
+        Users u
+    WHERE
+        u.banned = 'No'
+        AND u.role IN ('client', 'driver')
+),
+
+t2 as (
+    SELECT
+        t.*,
+        CASE 
+            WHEN t.status IN ('cancelled_by_driver', 'cancelled_by_client') THEN 1
+            WHEN t.status = 'completed' THEN 0
+        END AS cancel_indicator
+    FROM
+        Trips t
+    WHERE
+        EXISTS (SELECT t1.users_id FROM t1 WHERE t1.users_id = t.client_id)
+        AND EXISTS ((SELECT t1.users_id FROM t1 WHERE t1.users_id = t.driver_id))
+        AND t.request_at BETWEEN '2013-10-01' AND '2013-10-03'
+)
+SELECT 
+    t2.request_at AS Day,
+    ROUND(AVG(t2.cancel_indicator),2) AS 'Cancellation Rate'
+FROM   
+    t2
+GROUP BY t2.request_at
+ORDER BY Day;
+```
+
