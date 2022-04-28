@@ -466,5 +466,25 @@ SELECT
 
 ```
 
+### 570. Managers with at Least 5 Direct Reports (Medium)
 
+Idea:       
+- Joining on a field that has null values will ignore the nulls
+- In problems related to Manager and Employee being in the same table, you can take self-join on ManagerId and Id
+- After that simple GROUP BY and count should solve the problem. 
+- The only need to add a subquery is the fact that we have to produce only name in the output and we cannot do operations based on just name in the inner query as it could be duplicate for different people, we have to use id there.
+
+```sql
+SELECT t1.name 
+FROM
+    (SELECT
+        e1.id,
+        e1.name
+    FROM
+        Employee e1
+        JOIN Employee e2 ON e1.id = e2.managerId
+    GROUP BY
+        e1.id, e1.name
+    HAVING COUNT(e2.id) >= 5) t1;
+```
 
