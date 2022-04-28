@@ -288,3 +288,31 @@ GROUP BY t2.request_at
 ORDER BY Day;
 ```
 
+
+### 511. Game Play Analysis I
+
+Ideas:
+    - The trick is to not get carried away by possibility of using window functions such as RANK, FIRST_VALUE etc as the same thing can be achieved by using a simple GROUP BY and MIN(). If the label of the problem did not say EASY, you might get into window functions. Not sure Window functions run faster in this case or not. However, from the point of view of simplicity and readability it is a small and perfect solution.
+
+```SQL
+SELECT  
+    a.player_id,
+    MIN(a.event_date) AS first_login
+FROM
+    Activity a
+GROUP BY a.player_id;
+```
+
+### 
+
+Ideas:
+    - The trick is to not get carried away by possibility of using window functions such as RANK, FIRST_VALUE etc as the same thing can be achieved by using a simple GROUP BY and MIN(). If the label of the problem did not say EASY, you might get into window functions. Not sure Window functions run faster in this case or not. However, from the point of view of simplicity and readability it is a small and perfect solution.
+
+```SQL
+SELECT  
+    a.player_id,
+    MIN(a.event_date) AS first_login
+FROM
+    Activity a
+GROUP BY a.player_id;
+```
