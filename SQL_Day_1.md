@@ -289,7 +289,7 @@ ORDER BY Day;
 ```
 
 
-### 511. Game Play Analysis I
+### 511. Game Play Analysis I (Easy)
 
 Ideas:
     - The trick is to not get carried away by possibility of using window functions such as RANK, FIRST_VALUE etc as the same thing can be achieved by using a simple GROUP BY and MIN(). If the label of the problem did not say EASY, you might get into window functions. Not sure Window functions run faster in this case or not. However, from the point of view of simplicity and readability it is a small and perfect solution.
@@ -303,7 +303,7 @@ FROM
 GROUP BY a.player_id;
 ```
 
-### 512. Game Play Analysis II
+### 512. Game Play Analysis II (Easy)
 
 Ideas:
     - 2 approaches - Use correlated subquery or use window function (either as a derived table or a CTE)
@@ -352,7 +352,7 @@ FROM
 WHERE
     t1.loginorder = 1;
 ```
-### 534. Game Play Analysis III
+### 534. Game Play Analysis III (Medium)
 
 Ideas:
     - Basically the question needs running totals for unique playerid and date. It means using SUM() as window function is one of the obvious choices
@@ -380,3 +380,31 @@ FROM
 GROUP BY t1.player_id, t1.event_date, t1.games_played_so_far
 ORDER BY t1.player_id, t1.event_date;
 ```
+
+
+### 550. Game Play Analysis IV (Medium)
+
+Idea:
+    - The solution is the division of TWO subqueries in the SELECT clause of the main query itself. This makes this query unique
+    - Usage of the DATEDIFF function to JOIN in one of the subqueries is a very handy trick to choose anything "consecutive" or with a constant difference.
+    - Note, when a aggreagte function column is used without an alias, it takes the name of the full formula, so use it always with alias.
+    - Whenever calculating fractions and rates, be flexible to calculate numerators and denominators as separate subqueries
+
+```sql
+WITH t1 as (
+    SELECT
+        a.player_id,
+        MIN(a.event_date) as min_event_date
+    FROM
+        Activity a
+    GROUP BY a.player_id
+)
+SELECT
+    ROUND((SELECT COUNT(DISTINCT(t1.player_id))
+           FROM t1 JOIN Activity a1 
+                ON t1.player_id=a1.player_id 
+                AND DATEDIFF(a1.event_date, t1.min_event_date) = 1)/
+        (SELECT COUNT(DISTINCT a2.player_id) FROM Activity a2),2) AS fraction;
+
+```
+
