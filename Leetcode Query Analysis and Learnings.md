@@ -488,3 +488,32 @@ FROM
     HAVING COUNT(e2.id) >= 5) t1;
 ```
 
+### 571. Find Median Given Frequency of Numbers
+
+Idea:       
+- Do not actually try to decompress this in SQL. Hope that is clear.
+- Again, when it comes to median, you know you want to find 2 things - total(n) and positions floor(n+1)/2, floor (n+2)/2
+- Generally in median problems it is good to append columns to the table with total(n) and in this case the cumulative fequency
+- Median lies in the slot where cumulative frequency of the slot is minimum cumulative freq greater than floor(n+1)/2 and minimum cum freq where cum freq is greater than floor (n+2)/2. Then just take average of the num in those two rows.
+
+```sql
+WITH t1 as (
+
+    SELECT
+        n.num,
+        n.frequency,
+        SUM(n.frequency) OVER() AS total_frequency,
+        SUM(n.frequency) OVER(ORDER BY n.num) AS cumulative_frequency
+    FROM
+        Numbers n
+)
+
+SELECT
+    AVG(t1.num) as median
+FROM
+    t1
+WHERE   
+    t1.cumulative_frequency = (SELECT MIN(t1.cumulative_frequency) FROM t1 WHERE t1.cumulative_frequency >= FLOOR((total_frequency + 1)/2))
+    OR
+    t1.cumulative_frequency = (SELECT MIN(t1.cumulative_frequency) FROM t1 WHERE t1.cumulative_frequency >= FLOOR((total_frequency + 2)/2)) ;
+```
