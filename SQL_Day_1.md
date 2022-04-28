@@ -303,16 +303,52 @@ FROM
 GROUP BY a.player_id;
 ```
 
-### 
+### 512. Game Play Analysis II
 
 Ideas:
-    - The trick is to not get carried away by possibility of using window functions such as RANK, FIRST_VALUE etc as the same thing can be achieved by using a simple GROUP BY and MIN(). If the label of the problem did not say EASY, you might get into window functions. Not sure Window functions run faster in this case or not. However, from the point of view of simplicity and readability it is a small and perfect solution.
+    - 2 approaches - Use correlated subquery or use window function (either as a derived table or a CTE)
+    - The correlated subquery seems to take more time. Window function is better.
+    - Although it seems that the correlated subquery is easier to read and small, it seems that in such situations it is more efficient to create a CTE/derived table with a Window Function labelling our required row and then fetching that row from the CTE using the required value of the window function. 
+    
+All 3 versions of the solution are given below. 
 
 ```SQL
-SELECT  
+SELECT
     a.player_id,
-    MIN(a.event_date) AS first_login
+    a.device_id
 FROM
     Activity a
-GROUP BY a.player_id;
+WHERE
+    a.event_date = (SELECT MIN(a1.event_date) FROM ACTIVITY a1 WHERE a1.player_id = a.player_id);
+```
+```SQL
+SELECT
+    t1.player_id,
+    t1.device_id
+FROM
+(SELECT
+    a.player_id,
+    a.device_id,
+    a.event_date,
+    ROW_NUMBER() OVER (PARTITION BY a.player_id ORDER BY a.event_date) AS loginorder
+FROM
+    Activity a) t1
+WHERE
+    t1.loginorder = 1
+```
+```SQL
+WITH t1 as (SELECT
+    a.player_id,
+    a.device_id,
+    a.event_date,
+    ROW_NUMBER() OVER (PARTITION BY a.player_id ORDER BY a.event_date) AS loginorder
+FROM
+    Activity a) 
+SELECT
+    t1.player_id,
+    t1.device_id
+FROM
+    t1
+WHERE
+    t1.loginorder = 1;
 ```
