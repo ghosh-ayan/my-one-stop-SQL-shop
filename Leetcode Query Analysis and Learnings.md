@@ -1,13 +1,13 @@
 
 ### 569. Median Employee Salary (Hard)
 
-Idea:
-    - The trick in almost all Median problems in programs to know two things:
-        - First find total number of entries =  n      
-        - Next, the row numbers that is/are median row numbers can be defined as either of the two methods (I preferred the first one in the SQL query as it allows BETWEEN concept), otherwise to find exact ROW numbers you can use method 2.                
+Idea:        
+- The trick in almost all Median problems in programs to know two things:
+    - First find total number of entries =  n      
+    - Next, the row numbers that is/are median row numbers can be defined as either of the two methods (I preferred the first one in the SQL query as it allows BETWEEN concept), otherwise to find exact ROW numbers you can use method 2.                
             - METHOD 1: median are row numbers BETWEEN n/2 and (n/2)+1             
             - METHOD 2: median are row numbers FLOOR((n+1)/2), FLOOR((n+2)/2)               
-        - Both above methods work for even and odd values of n.               
+    - Both above methods work for even and odd values of n.               
         
 ```sql
 WITH t1 as (
