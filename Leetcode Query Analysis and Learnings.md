@@ -733,3 +733,33 @@ FROM
 GROUP BY dept_name
 ORDER BY student_number DESC, dept_name;
 ```
+### 585. Investments in 2016
+
+Mildly irritating question. However, exhibits the usage of EXISTS and NOT EXISTS subqueries.
+
+```sql
+SELECT
+    ROUND(SUM(i1.tiv_2016),2) AS tiv_2016
+
+FROM
+    Insurance i1
+
+WHERE
+    EXISTS (
+        SELECT i2.pid
+        FROM
+        Insurance i2
+        WHERE i2.pid <> i1.pid
+        AND i2.tiv_2015 = i1.tiv_2015
+    )
+    
+    AND NOT EXISTS (
+        SELECT i3.pid
+        FROM
+        Insurance i3
+        WHERE i3.pid <> i1.pid
+        AND i3.lat = i1.lat
+        AND i3.lon = i1.lon
+    )
+;
+```
