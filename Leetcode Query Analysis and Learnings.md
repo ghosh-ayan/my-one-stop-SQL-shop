@@ -678,4 +678,44 @@ SELECT
 FROM
     cte2;
 ```
+### 180. Consecutive Numbers
 
+Idea: 
+- Using Lag() or Lead() window functions the solution should be easy
+- The Leetcode solution uses JOINs only, which is nice too. It is useful to remember that you don't always have to use JOIN ON condition, you can also use JOIN table1, table2 WHERE some condition, although it seems that if you can handle with ON condition it is probably more efficient.
+
+My Solution:
+```sql
+WITH cte1 AS (SELECT
+    l.id,
+    l.num as first_num,
+    LEAD(l.num, 1) OVER(ORDER BY l.id) AS second_num,
+    LEAD(l.num, 2) OVER(ORDER BY l.id) AS third_num
+FROM
+    Logs l)
+
+SELECT
+    cte1.first_num AS ConsecutiveNums
+FROM
+    cte1
+WHERE
+    cte1.first_num = cte1.second_num
+    AND cte1.second_num = cte1.third_num
+GROUP BY cte1.first_num;
+```
+
+Leetcode Solution:
+```sql
+SELECT DISTINCT
+    l1.Num AS ConsecutiveNums
+FROM
+    Logs l1,
+    Logs l2,
+    Logs l3
+WHERE
+    l1.Id = l2.Id - 1
+    AND l2.Id = l3.Id - 1
+    AND l1.Num = l2.Num
+    AND l2.Num = l3.Num
+;
+```
