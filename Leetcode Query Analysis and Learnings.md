@@ -719,3 +719,17 @@ WHERE
     AND l2.Num = l3.Num
 ;
 ```
+
+### 580. Count Student Number in Departments (Medium)
+
+This is an easy one, but you could take some time trying to remember whether  if you use group by and the grouping column does not have any rows in the other table (have nulls in those columns), does COUNT() return null. The answer is COUNT(the other table's column) will return 0.
+```sql
+SELECT
+    d.dept_name,
+    COUNT(student_id) as student_number
+FROM
+    Department d
+    LEFT JOIN Student s ON s.dept_id = d.dept_id
+GROUP BY dept_name
+ORDER BY student_number DESC, dept_name;
+```
