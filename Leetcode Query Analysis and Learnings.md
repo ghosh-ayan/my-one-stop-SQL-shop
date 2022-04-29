@@ -561,7 +561,7 @@ WHERE
 ;
 ```
 
-### 577. Employee Bonus
+### 577. Employee Bonus (Easy)
 
 A very deceptive question indeed!
 
@@ -581,3 +581,101 @@ WHERE
     b.bonus < 1000 
     OR b.bonus IS NULL;
 ```
+
+
+### 579. Find Cumulative Salary of an Employee (Hard)
+
+Idea :
+- Note the tricky part of the question is that there are some missing months where employee has not worked. otherwise you could have thought of a window function sum() over 2 PRECEDING and CURRENT ROW     
+- The right solution is do a DOUBLE SELF JOIN and use the condition to specify the previous and previos-to-previous month. These will ensure null values for the employees who did not work in those months.           
+- Then you just need to add those salary columns, use IFNULL() or COALESCE() to ensure that column values added do not have to deal with NULL, instead 0 if not present
+- Mind the fact that you should not use SUM(col1,col2,col3) as SUM() is an aggregate function used for rows, cannot sum across columns, for that you just need to use + operator,                  
+- Lastly, an added layer of complication is added by asking to remove the most recent month. The trick is to not try removing it at first, rather than once all above is done, create a separate CTE with list of the months to be filtered out. Once you have it, just do a NOT EXISTS in the CTE in the main query to filter them out.
+
+```sql
+WITH t1 AS (SELECT
+    e1.id,
+    e1.month,
+    e1.salary + COALESCE(e2.salary,0) + COALESCE(e3.salary,0) as salary
+FROM
+    Employee e1
+    LEFT JOIN Employee e2 ON e1.id =  e2.id AND e2.month = e1.month - 1
+    LEFT JOIN Employee e3 ON e1.id =  e3.id AND e3.month = e1.month - 2
+    ),
+
+t2 AS (
+    SELECT
+        e4.id,
+        MAX(e4.month) as recent_month
+    FROM
+        Employee e4
+    GROUP BY e4.id
+)
+SELECT 
+    t1.id,
+    t1.month,
+    t1.salary
+FROM
+    t1
+WHERE 
+    NOT EXISTS (
+        SELECT 
+            t2.id,
+            t2.recent_month
+        FROM
+            t2
+        WHERE 
+            t2.id = t1.id
+            AND t2.recent_month = t1.month 
+    )
+ORDER BY t1.id, t1.month DESC;
+
+```
+
+### 578. Get Highest Answer Rate Question (Medium)
+
+Idea:
+- The Leetcode solution is slightly better. And it shows that you can conditionally SUM up a group (based on IF(condition, 1, 0)). Basically it utilizes your idea of adding an indicator variable for rate calculation problems. However, in this case a simple binary variables added by CASE WHEN won't work as the denominator is not all the entries. But they have still done it well. 
+- Remember you have IF() in your toolkit as a conditional tool apart from CASE WHEN. Also IFNULL is another null handling version of IF
+- Try to name ctes as cte1 and cte2 rather than t1 and t2. Will avoid confusion in future.
+
+Leetcode Solution (recommended):      
+```sql
+select question_id as survey_log from
+(select question_id, 
+ SUM(IF(action = "answer", 1, 0)) / SUM(IF(action = "show", 1, 0)) as answer_rate
+ from surveylog
+ group by question_id
+ order by answer_rate DESC, question_id
+ limit 1
+)
+```
+
+My Solution:
+```sql
+WITH cte1 AS (SELECT
+    s.question_id,
+    s.action,
+    COUNT(*) AS action_count
+FROM
+    SurveyLog s
+WHERE
+    s.action <> 'skip'
+GROUP BY s.question_id, s.action),
+
+cte2 AS (SELECT
+    c1.question_id,
+    c1.action_count / c2.action_count AS answer_rate
+FROM
+    cte1 c1
+    JOIN
+    cte1 c2 ON c1.question_id = c2.question_id AND c1.action < c2.action 
+ORDER BY answer_rate DESC, c1.question_id
+LIMIT 1)
+
+SELECT 
+    cte2.question_id AS survey_log
+FROM
+    cte2;
+```
+
