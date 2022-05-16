@@ -763,3 +763,21 @@ WHERE
     )
 ;
 ```
+### 586. Customer Placing the Largest Number of Orders (Easy)
+
+This is the classic problem where you check usage of a CTE, subquery, etc.
+Although this query can avoid usage of a CTE, as MySQL allows to ORDER BY COUNT(\*) without using it in the select clause, still I think in situations where more than 1 maximum can exist, the below query is better.
+Also, it is memory efficient as for the second set of scans it uses the temporary table instead of the actual table.
+
+```sql
+WITH cte1 AS (SELECT
+    o1.customer_number,
+    COUNT(order_number) AS order_count
+FROM Orders o1
+GROUP BY o1.customer_number)
+
+SELECT 
+    cte1.customer_number
+FROM cte1
+WHERE cte1.order_count = (SELECT MAX(order_count) FROM cte1);
+```
