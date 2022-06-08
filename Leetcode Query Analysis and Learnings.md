@@ -781,3 +781,42 @@ SELECT
 FROM cte1
 WHERE cte1.order_count = (SELECT MAX(order_count) FROM cte1);
 ```
+
+### 603. Consecutive Available Seats (Easy)
+
+```sql
+SELECT
+    c1.seat_id
+FROM
+    Cinema c1
+
+WHERE 
+    c1.free = 1
+    AND EXISTS (
+        SELECT
+                c2.seat_id
+        FROM
+            Cinema c2
+        WHERE 
+            (c2.seat_id = c1.seat_id + 1
+                OR
+             c2.seat_id = c1.seat_id - 1)
+             AND c2.free = 1
+    )
+ORDER BY c1.seat_id;
+```
+
+Given Solution
+
+```sql
+select distinct a.seat_id
+from cinema a join cinema b
+  on abs(a.seat_id - b.seat_id) = 1
+  and a.free = true and b.free = true
+order by a.seat_id
+;
+```
+
+Few things to note here, mostly tricks:
+-   The logic to say that x and y are consecutive can be expressed as x=y-1 OR x=y+1 or simply as abs(x-y)=1. The second one seems to be more succinct and stylish, however, not sure whether calling a function abs() affects performance or not.
+-   I have used correlated subquery. It could impact performance. On the other hand, the leetcode solution uses a cross-join instead. This is a handy technique. Sometimes in situations where you want to filter based on conditions of "interrelated rows", one can think of getting a cartesian product first, and then doing a simpler filtering from the cartesian product table rather than subqueries or window functions.
