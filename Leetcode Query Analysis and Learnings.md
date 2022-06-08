@@ -913,3 +913,28 @@ Few things to note here, mostly tricks:
 -   I have used correlated subquery. It could impact performance. On the other hand, the leetcode solution uses a cross-join instead. This is a handy technique. Sometimes in situations where you want to filter based on conditions of "interrelated rows", one can think of getting a cartesian product first, and then doing a simpler filtering from the cartesian product table rather than subqueries or window functions.
 
 
+### 607. Sales Person (Easy)
+
+This is a nice problem! Although labelled as easy, this one is very tricky.
+- If one uses simply joining on three tables and filtering on not equal to RED, it will fail. 
+- One also realises confusing stuff that happens when using both LEFT/RIGHT (OUTER) and INNER JOINS in the same bunch of join statements, note that JOINS are executed in pairs in the order they are mentioned.
+- Best way is to use Subqueries for this problem. either use NOT IN or NOT EXISTS subquery.
+
+```sql
+SELECT 
+    s1.name
+FROM
+    SalesPerson s1
+WHERE
+    NOT EXISTS (
+        SELECT o1.sales_id
+        FROM
+         Orders o1
+         INNER JOIN Company c1 ON c1.com_id = o1.com_id
+        WHERE
+            c1.name = 'RED'
+            AND o1.sales_id = s1.sales_id
+    );
+```
+
+
