@@ -782,6 +782,71 @@ FROM cte1
 WHERE cte1.order_count = (SELECT MAX(order_count) FROM cte1);
 ```
 
+### 601. Human Traffic of Stadium (Hard)
+
+The nice thing to note here is:
+    - The CTEs themselves can be aliased many times in multiple subqueries, which is cool.
+    - In such problems of consecutive rows, we need to focus on selection criteria for 1 single row, and write our logic around it.
+    - For example, a row is selected (after filtering everything based on >= 100) if 
+    1. Another row exists with id = id + 1 and another row exists with id = id + 2 OR   -- this row is the beginning of 3-series
+    2. Another row exists with id = id - 1 and another row exists with id = id -2 OR    -- this row is the end of 3-series
+    3. Another row exists with id = id - 1 and another row exists with id = id + 1 OR   -- this row is the middle of 3-series
+    - Note that, the problem states 3 or more... but anything that is part of a 4-series or 5-series or n-series is also part of a 3-series, so above logic works.
+    - The Leetcode solution uses a 3-cross join to something similar. One could think of that too.
+
+```sql
+WITH cte1 AS (SELECT *
+
+FROM
+    Stadium S1
+WHERE 
+    S1.people >= 100)
+    
+SELECT
+    *
+FROM
+    cte1 x
+WHERE
+    (EXISTS (
+        SELECT a.id
+        FROM cte1 a
+        WHERE a.id = x.id + 1 
+             ) 
+     AND EXISTS
+            (
+        SELECT b.id
+        FROM cte1 b
+        WHERE b.id = x.id + 2
+             ) 
+    )
+    OR
+    (EXISTS (
+        SELECT c.id
+        FROM cte1 c
+        WHERE c.id = x.id - 1 
+             ) 
+     AND EXISTS
+            (
+        SELECT d.id
+        FROM cte1 d
+        WHERE d.id = x.id - 2
+             ) 
+    )
+    OR (EXISTS (
+        SELECT e.id
+        FROM cte1 e
+        WHERE e.id = x.id + 1
+                )
+       AND EXISTS(
+        SELECT f.id
+        FROM cte1 f
+        WHERE f.id = x.id - 1        
+                )
+       )
+ORDER BY x.visit_date;
+```
+
+
 ### 602. Friend Requests II: Who Has the Most Friends (Medium)
 
 ```sql
@@ -846,3 +911,5 @@ order by a.seat_id
 Few things to note here, mostly tricks:
 -   The logic to say that x and y are consecutive can be expressed as x=y-1 OR x=y+1 or simply as abs(x-y)=1. The second one seems to be more succinct and stylish, however, not sure whether calling a function abs() affects performance or not.
 -   I have used correlated subquery. It could impact performance. On the other hand, the leetcode solution uses a cross-join instead. This is a handy technique. Sometimes in situations where you want to filter based on conditions of "interrelated rows", one can think of getting a cartesian product first, and then doing a simpler filtering from the cartesian product table rather than subqueries or window functions.
+
+
