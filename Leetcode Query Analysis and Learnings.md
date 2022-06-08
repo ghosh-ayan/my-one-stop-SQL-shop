@@ -782,6 +782,32 @@ FROM cte1
 WHERE cte1.order_count = (SELECT MAX(order_count) FROM cte1);
 ```
 
+### 602. Friend Requests II: Who Has the Most Friends (Medium)
+
+```sql
+WITH cte1 AS (SELECT
+    t1.requester_id AS id
+FROM
+    RequestAccepted t1
+    
+UNION ALL
+
+SELECT
+    t2.accepter_id AS id
+FROM
+    RequestAccepted t2)
+
+SELECT cte1.id, COUNT(*) as num
+FROM
+    cte1
+GROUP BY cte1.id
+ORDER BY num DESC
+LIMIT 1
+```
+
+- Key point above is usage of "UNION ALL", and not UNION. We need to combine data from both the columns to see how many 'friend' relationships a user has. But we do not want to remove duplicates while Unioning the columns.
+- Also, to find the one with the maximum, we use the simple idea of COUNT(\*), GROUP BY, ORDER BY COUNT(\*) and LIMIT 1. If the question asked to remove the count column, we would have taken the above as another cte and selected only the user column from that.
+
 ### 603. Consecutive Available Seats (Easy)
 
 ```sql
