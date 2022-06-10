@@ -1000,3 +1000,23 @@ SELECT
 FROM cte1
 WHERE distance <> 0;
 ```
+
+### 614. Second Degree Follower (Medium)
+
+The solution involves a subquery in the WHERE clause which can be written as 'IN' subquery or 'EXISTS' subquery. IN is simpler in this case.
+
+```sql
+SELECT
+    f1.followee AS follower,
+    COUNT(f1.follower) AS num
+FROM
+    Follow f1
+WHERE f1.followee IN (
+    SELECT
+        f2.follower
+    FROM
+        Follow f2
+)
+GROUP BY f1.followee
+ORDER BY f1.followee;
+```
