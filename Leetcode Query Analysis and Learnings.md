@@ -957,3 +957,21 @@ FROM
 ORDER BY t1.id;
 ```
 
+### 610. Triangle Judgement (Easy)
+
+Just evaluate the triangle inequality using an CASE WHEN or an IF statement.
+
+```sql
+SELECT
+    t.x,
+    t.y,
+    t.z,
+    CASE
+        WHEN ((t.x + t.y > t.z) AND (t.x + t.z > t.y) AND (t.y + t.z > t.x))
+            THEN 'Yes'
+        ELSE
+            'No'
+    END AS triangle
+FROM
+    Triangle t;
+```
