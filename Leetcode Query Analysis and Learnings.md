@@ -1020,3 +1020,55 @@ WHERE f1.followee IN (
 GROUP BY f1.followee
 ORDER BY f1.followee;
 ```
+
+
+### 615. Average Salary: Departments VS Company (Hard)
+
+This is again one of those problems that need to be broken down in processing stages (in order to provide output in the manner provided in leetcode output).
+
+First, you need the date_format function to get the pay_month across all rows
+Second, you need to compute the monthly company and dept wise averages across those rows
+Third, you need to select distinct pay_month, department_id and whether or not the dept is higher/lower/same as company monthly avg by CASE WHEN.
+
+There seems to be a trickier solution provided in leetcode that is hard to think in terms of, by JOINs.
+
+```sql
+WITH cte1 AS (
+    SELECT
+        s1.id,
+        s1.employee_id,
+        e1.department_id,
+        s1.amount,
+        s1.pay_date,
+        DATE_FORMAT(s1.pay_date, '%Y-%m') AS pay_month 
+    FROM
+        Salary s1
+        INNER JOIN Employee e1 ON e1.employee_id = s1.employee_id
+    ),
+cte2 AS (
+    
+    SELECT
+        cte1.id,
+        cte1.employee_id,
+        cte1.department_id,
+        cte1.amount,
+        cte1.pay_date,
+        cte1.pay_month,
+        AVG(cte1.amount) OVER(PARTITION BY cte1.department_id, cte1.pay_month) AS dept_monthly_avg,
+        AVG(cte1.amount) OVER(PARTITION BY cte1.pay_month) AS company_monthly_avg 
+    FROM
+        cte1
+)
+    
+SELECT DISTINCT
+    cte2.pay_month,
+    cte2.department_id,
+    CASE
+        WHEN cte2.dept_monthly_avg = cte2.company_monthly_avg THEN 'same'
+        WHEN cte2.dept_monthly_avg > cte2.company_monthly_avg THEN 'higher'
+        ELSE 'lower'
+    END AS comparison
+FROM  
+    cte2
+    ;
+```
