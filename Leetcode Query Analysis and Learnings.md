@@ -937,4 +937,23 @@ WHERE
     );
 ```
 
+### 608. Tree Node (Medium)
+
+Not very complex when you can figure out the simple conditions of a
+    - Root Node - parent node field is NULL
+    - Leaf Node - it itself is not present in the parent node column
+    - Inner - Everything else
+
+```sql
+SELECT
+    t1.id,
+    CASE 
+    WHEN t1.p_id IS NULL THEN 'Root'
+    WHEN (SELECT COUNT(*) FROM Tree t2 WHERE t2.p_id = t1.id) = 0 THEN 'Leaf'
+    ELSE 'Inner' 
+    END AS type
+FROM
+    Tree t1
+ORDER BY t1.id;
+```
 
