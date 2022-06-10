@@ -975,3 +975,28 @@ SELECT
 FROM
     Triangle t;
 ```
+
+### 612. Shortest Distance in a Plane (Medium)
+
+Nice Problem. Things to consider :
+    - A classic case when CROSS JOIN is needed. 
+    - Note that MySQL supports power calculations with POW(x,y) function and not with operators such as ^ or \*\*.
+    - Note that MySQL supports SQRT function.
+    - Do not forget to ROUND off
+    - Most importantly, you need a way to rule out the rows that are same points, either specify that in the JOIN condition sopmehow or using a WHERE clause like I used below.
+    - There is scope for optimization. We could make this more optimized if we do not calculate for all possible combinations of cross join, including same points.
+```sql
+WITH cte1 AS (
+SELECT
+    p1.x as x1,
+    p1.y as y1,
+    p2.x as x2,
+    p2.y as y2,
+    SQRT(POW((p1.x - p2.x),2) + POW((p1.y - p2.y),2)) AS distance
+FROM    
+    Point2D p1, Point2D p2)
+SELECT 
+    ROUND(MIN(cte1.distance),2) AS shortest
+FROM cte1
+WHERE distance <> 0;
+```
