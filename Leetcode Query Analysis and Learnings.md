@@ -1072,3 +1072,69 @@ FROM
     cte2
     ;
 ```
+
+### 619. Biggest Single Number  (Easy)
+
+The only important thing to remember is that to have 'null' as a possbile output, it helps to wrap it inside another query.
+
+```sql
+SELECT MAX(t1.num) as num
+FROM
+(SELECT 
+    m.num
+FROM
+    MyNumbers m
+GROUP BY m.num
+HAVING COUNT(*) = 1) AS t1;
+```
+
+### 620. Not Boring Movies (Easy)
+
+Remember the usage of MOD(field, integer) to check to check even/odd or multiple of a particular integer, comes in handy.
+
+```sql
+Select
+    c1.*
+FROM
+    Cinema c1
+WHERE
+    MOD(c1.id,2) = 1
+    AND c1.description NOT LIKE '%boring%'
+ORDER BY c1.rating DESC;
+```
+### 626. Exchange Seats (Medium)
+
+This is an interesting one. Things to note:
+- Firstly, the problem does not say update the table, so it will be a select statement. Its important to know that.
+- Secondly. its all about identifying the scenarios. There are only three and in the below order, involves conbination of CASE statement abd subqueries for each condition. When id is odd but is the last id, do nothing. When the id is odd but not the last id, pick up the name from id+1 row, when the id is even, pick up the name from id-1 row.
+
+```sql
+SELECT
+
+    s1.id,
+    CASE 
+        WHEN (MOD(s1.id,2) = 1 AND s1.id = (SELECT MAX(s2.id) FROM Seat s2))
+            THEN s1.student
+        WHEN MOD(s1.id,2) = 0 
+            THEN (SELECT s3.student FROM Seat s3 WHERE s3.id = s1.id-1)
+        WHEN MOD(s1.id,2) = 1 
+            THEN (SELECT s4.student FROM Seat s4 WHERE s4.id = s1.id+1)
+    END AS student
+
+FROM 
+    Seat s1;
+```
+
+### 627. Swap Salary (Easy)
+
+Another interesting problem. Things to note:
+
+1. The problem explicitly states usage of UPDATE STATEMENT, and a single UPDATE single statement, no select statement.
+2. We need to remember that fact that CASE WHEN works with UPDATE statement as well.
+
+```sql
+UPDATE Salary s1
+    SET s1.sex = CASE WHEN s1.sex = 'm' THEN 'f' ELSE 'm' END;
+```
+
+
